@@ -1,0 +1,101 @@
+services:
+  kvstore1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8081
+      - NODES=kvstore1:8081,kvstore2:8082,kvstore3:8083
+      - DEBUG=true
+    ports:
+      - "8081:8081"
+    networks:
+      - kvstore-network
+    healthcheck:
+      test: ["CMD", "netstat", "-tuln", "|", "grep", ":8081"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: kvstore1
+
+  kvstore2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8082
+      - NODES=kvstore1:8081,kvstore2:8082,kvstore3:8083
+      - DEBUG=true
+    ports:
+      - "8082:8082"
+    networks:
+      - kvstore-network
+    healthcheck:
+      test: ["CMD", "netstat", "-tuln", "|", "grep", ":8082"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: kvstore2
+
+  kvstore3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8083
+      - NODES=kvstore1:8081,kvstore2:8082,kvstore3:8083
+      - DEBUG=true
+    ports:
+      - "8083:8083"
+    networks:
+      - kvstore-network
+    healthcheck:
+      test: ["CMD", "netstat", "-tuln", "|", "grep", ":8083"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: kvstore3
+
+  client:
+    image: python:3.9-slim
+    environment:
+      - IN_DOCKER=true
+    volumes:
+      - ./test_client.py:/app/test_client.py
+    command: ["python", "/app/test_client.py"]
+    depends_on:
+      kvstore1:
+        condition: service_healthy
+      kvstore2:
+        condition: service_healthy
+      kvstore3:
+        condition: service_healthy
+    networks:
+      - kvstore-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  kvstore-network:
+    driver: bridge
