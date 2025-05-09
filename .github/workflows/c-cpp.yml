@@ -1,0 +1,63 @@
+name: Key-Value Store CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io python3 python3-pip
+        pip3 install docker-compose
+
+    - name: Build Docker Image
+      run: |
+        docker-compose build
+
+    - name: Run Containers and Test
+      run: |
+        docker-compose up -d kvstore1 kvstore2 kvstore3
+        sleep 60  # Wait for nodes to be healthy
+        docker-compose run client
+      continue-on-error: true
+
+    - name: Collect Logs
+      if: always()
+      run: |
+        docker logs kvstore1 > kvstore1.log
+        docker logs kvstore2 > kvstore2.log
+        docker logs kvstore3 > kvstore3.log
+        docker-compose logs client > client.log
+
+    - name: Upload Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs
+        path: |
+          kvstore1.log
+          kvstore2.log
+          kvstore3.log
+          client.log
+
+    - name: Check Container Health
+      run: |
+        docker ps
+        docker inspect kvstore1 | jq .[].State.Health
+        docker inspect kvstore2 | jq .[].State.Health
+        docker inspect kvstore3 | jq .[].State.Health
+
+    - name: Clean Up
+      if: always()
+      run: |
+        docker-compose down
+        docker network rm kvstore-network || true
