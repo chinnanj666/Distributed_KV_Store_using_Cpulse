@@ -25,7 +25,7 @@ def send_command(host, port, command):
         except Exception as e:
             print(f"Attempt {attempt + 1}: Error with {host}:{port}: {e}")
             if attempt < max_retries - 1:
-                time.sleep(1)  # Wait 1s before retry
+                time.sleep(1)     # Wait 1s before retry
             continue
     return ""
 
