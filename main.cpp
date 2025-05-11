@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 // #include <iostream>
 
 // int main() {
-//     DistributedKVStore kvstore("127.0.0.1", 8081); // Changed port to 8081
+//     DistributedKVStore kvstore("127.0.0.1", 8081); // Changed port to 8081, if not works
 //     if (!kvstore.startServer()) {
 //         std::cerr << "Failed to start server" << std::endl;
 //         return 1;
