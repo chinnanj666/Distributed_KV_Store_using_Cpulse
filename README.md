@@ -119,7 +119,7 @@ Distributed_KV_Store/
      docker exec kvstore3 lsof -p 1 | wc -l
      ```
    - Check listening sockets:
-     ```bash
+     ```bash 
      docker exec kvstore1 netstat -tuln | grep :8081
      docker exec kvstore3 netstat -tuln | grep :8083
      ```
