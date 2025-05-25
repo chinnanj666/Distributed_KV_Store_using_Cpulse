@@ -14,7 +14,7 @@ bool connectToServer(int& sock) {
         std::cerr << "Failed to create socket: " << strerror(errno) << std::endl;
         return false;
     }
-
+   
     sockaddr_in server;
     server.sin_family = AF_INET;
     server.sin_port = htons(8081);
