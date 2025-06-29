@@ -51,13 +51,13 @@ Distributed_KV_Store/
    ```
 
 ### Run Nodes and Client Locally
-1. Start nodes:
+1. Start nodes:  
    ```bash
-   docker-compose up -d kvstore1 kvstore2 kvstore3
+    docker-compose up -d kvstore1 kvstore2 kvstore3
    ```
 2. Run the client:
    ```bash
-   python3 test_client.py
+    python3 test_client.py
    ```
 3. Expected output:
    ```
